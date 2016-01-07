@@ -18,4 +18,12 @@ They shouldn't be hard to do, just tedious.
 
 # Installing
 
-`opam pin add cmark .`
+To build, you will need to install [car](https://github.com/jonathanyc/car), a collection of ocamlbuild aliases.
+
+Then you can install via OPAM with:
+
+    opam pin add cmark .
+
+Alternatively you can install using `car`:
+
+    car lib
