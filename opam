@@ -1,0 +1,16 @@
+opam-version: "1.2"
+name: "cmark"
+version: "0.1"
+maintainer: "Jonathan Chan <jyc@fastmail.fm>"
+authors: "Jonathan Chan <jyc@fastmail.fm>"
+homepage: "https://github.com/jgm/cmark"
+bug-reports: "https://github.com/jonathanyc/ocaml-cmark/issues"
+license: "BSD 2-Clause"
+dev-repo: "git@github.com:jonathanyc/ocaml-cmark.git"
+build: [
+]
+install: ["./car" "lib"]
+remove: ["./car" "unlib"]
+depends: [
+  "ocamlfind" {build}
+]

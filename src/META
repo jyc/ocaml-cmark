@@ -1,0 +1,5 @@
+# begin mk META
+requires = "utop ctypes.foreign"
+archive(byte) = "cmark.cma"
+archive(native) = "cmark.cmxa"
+# end
