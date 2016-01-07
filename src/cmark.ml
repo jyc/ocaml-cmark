@@ -35,7 +35,7 @@ let finalized (x : t) =
 let markdown_to_html' =
   foreign "cmark_markdown_to_html" (string @-> size_t @-> int @-> returning string)
 
-let markdown_to_html s =
+let html_of_commonmark s =
   let sz = Unsigned.Size_t.of_int (String.length s) in
   markdown_to_html' s sz 0
 
@@ -78,14 +78,14 @@ let fclose =
 let parse_document' =
   foreign "cmark_parse_document" (string @-> size_t @-> int @-> returning (ptr void))
 
-let parse_document ?(flags : parse_flag list = []) s =
+let of_string ?(flags : parse_flag list = []) s =
   let sz = Unsigned.Size_t.of_int (String.length s) in
   finalized { node = parse_document' s sz (int_of_flags flags) }
 
 let parse_file' =
   foreign "cmark_parse_file" (ptr void @-> int @-> returning (ptr void))
 
-let parse_file ?(flags : parse_flag list = []) path =
+let of_file ?(flags : parse_flag list = []) path =
   let fh = fopen path "r" in
   if fh = null then `Error "fopen: Failed to open file."
   else 
@@ -117,9 +117,9 @@ let renderer prim ?(flags : render_flag list = []) { node } =
 let rendererw prim ?(flags : render_flag list = []) ~width { node } =
   prim node (int_of_flags flags) width
 
-let render_xml = renderer render_xml'
-let render_html = renderer render_html'
+let to_xml = renderer render_xml'
+let to_html = renderer render_html'
 
-let render_man = rendererw render_man'
-let render_commonmark = rendererw render_commonmark'
-let render_latex = rendererw render_latex'
+let to_man = rendererw render_man'
+let to_commonmark = rendererw render_commonmark'
+let to_latex = rendererw render_latex'
