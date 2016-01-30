@@ -15,4 +15,5 @@ depends: [
   "car" {build >= "1.0.0" & < "2.0.0"}
   "ocamlfind" {build}
   "ctypes" {>= "0.4.1"}
+  "ctypes-foreign" {>= "0.4.0"}
 ]
