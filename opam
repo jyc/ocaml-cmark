@@ -9,11 +9,11 @@ license: "BSD 2-Clause"
 dev-repo: "git@github.com:jonathanyc/ocaml-cmark.git"
 build: [
 ]
-install: ["car" "lib"]
-remove: ["car" "unlib"]
+install: ["./car" "lib"]
+remove: ["./car" "unlib"]
 depends: [
-  "car" {build >= "1.0.0" & < "2.0.0"}
   "ocamlfind" {build}
+  "utop" {build}
   "ctypes" {>= "0.4.1"}
   "ctypes-foreign" {>= "0.4.0"}
 ]
