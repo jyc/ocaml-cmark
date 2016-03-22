@@ -17,3 +17,7 @@ depends: [
   "ctypes" {>= "0.4.1"}
   "ctypes-foreign" {>= "0.4.0"}
 ]
+depexts: [
+  [["homebrew" "osx"] ["cmark"]]
+]
+available: [ ocaml-version >= "4.02" ]

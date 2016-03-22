@@ -1,8 +1,6 @@
-#!/usr/bin/env utop
-#require "unix"
-#require "str"
-(* end script header *)
-
+#!/usr/bin/env ocaml
+#load "unix.cma"
+#load "str.cma"
 (* car: A collection of aliases for common tasks on OCaml projects using ocamlbuild.
    (cons was taken!)
 
