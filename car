@@ -163,17 +163,22 @@ let rec parse_list chars =
   let rec loop i entries = function
     | ' ' :: cs -> loop i entries cs
     | '\n' :: cs -> loop (i + 1) entries cs
-    | ']' :: cs -> `Ok (i, `List entries, cs)
-    | '#' :: cs -> loop (i + 1) entries cs
+    | ']' :: cs -> `Ok (i, `List (List.rev entries), cs)
+    | '#' :: cs -> 
+      let rec eat = function
+        | '\n' :: cs -> loop (i + 1) entries cs
+        | _ :: cs -> eat cs
+        | [] -> `Fail (i, "Unexpected EOF.")
+      in eat cs
     | _ :: _ as cs ->
       begin match parse_value cs with
-        | `Fail (j, s) -> `Fail (i + j, s)
-        | `Ok (j, x, cs) ->
-          begin match cs with
-            | (',' :: cs) | (_ :: _ as cs) ->
-              loop (i + j) (x :: entries) cs
-            | [] -> `Fail (i + j, "Unexpected EOF.")
-          end
+      | `Fail (j, s) -> `Fail (i + j, s)
+      | `Ok (j, x, cs) ->
+        begin match cs with
+        | (',' :: cs) | (_ :: _ as cs) ->
+          loop (i + j) (x :: entries) cs
+        | [] -> `Fail (i + j, "Unexpected EOF.")
+        end
       end
     | [] -> `Fail (i, "Unexpected EOF.")
   in loop 0 [] chars
@@ -302,6 +307,32 @@ let run_status cmd =
   | _ ->
     error @@ sprintf "Command failed: '%s' exited abnormally." cmd
 
+(* TODO: document. *)
+let run' ?(env=[]) ?(args=[]) cmd =
+  if !log_commands then
+    print_endline cmd ;
+
+  let args' = Array.of_list (cmd :: args) in
+  let env' =
+    Array.append
+      (Array.of_list env)
+      (Unix.environment ())
+  in
+
+  let pid = Unix.fork () in
+
+  if pid = 0 then begin
+    (* We're the child. *)
+    Unix.execvpe cmd args' env'
+  end ;
+
+  match Unix.waitpid [] pid with
+  | _, WEXITED 0 -> ()
+  | _, WEXITED x ->
+    error @@ sprintf "Command failed: '%s' exited with code %d." cmd x
+  | _ ->
+    error @@ sprintf "Command failed: '%s' exited abnormally." cmd
+
 (** [has_package name] returns [true] if the package [name] is known to
     ocamlfind. *)
 let has_package name =
@@ -345,13 +376,15 @@ let write_to_file path s =
   output_string och s ;
   close_out och
 
+
+
 (** [modules ()] returns a list of the OCaml modules in the current directory.
     It does this by finding all the .ml files and calling [mcase] on the
     filenames. *)
 let modules () =
   Sys.readdir "."
   |> Array.to_list
-  |> List.filter (fun s -> Filename.check_suffix s ".ml")
+  |> List.filter (fun s -> List.exists (Filename.check_suffix s) [".ml"; ".mly"; ".mll"])
   |> List.map Filename.chop_extension
   |> List.map mcase
 
@@ -541,8 +574,9 @@ let rules =
     fun { project; flags } ->
       with_module_list ~excludes:["Main"] ~dest:(sprintf "%s.mltop" project)
         (fun () ->
+           let flags = "-pkg utop" :: "-tag thread" :: flags in
            ocb ~flags @@ sprintf "%s.top" project ;
-           install (sprintf "%s.top" project))) ;
+           install @@ sprintf "%s.top" project)) ;
 
    ("topgen",
     "Splice support code for a toplevel in .ocamlinit and _top.ml.",
@@ -551,13 +585,6 @@ let rules =
       let topfile = project ^ "_top.ml" in  
       splice_file ~ml:true "../.ocamlinit" "topgen" "#thread\n#directory \"src/_build\"" ;
       splice_file ~ml:true topfile "topgen" "let () = UTop_main.main ()" ;
-      if not (List.mem "utop" requires) then begin
-        note "topgen" "I noticed that 'utop' isn't contained in 'requies' in %s." config_path ;
-        note "topgen" "You add it now if want to use the generated %s," topfile ;
-        note "topgen" "or delete it if you don't want to use UTop." ;
-        note "topgen" "UTop also expects threads to be enabled." ;
-        note "topgen" "If you haven't already, you can add the line 'true: thread' to _tags." ;
-      end
    ) ;
 
    (* doc runs ocamldoc on all of the modules in your project except for *_test
@@ -566,7 +593,7 @@ let rules =
     "Build project documentation.",
     Build,
     (fun { project; flags } ->
-       with_module_list ~dest:(sprintf "%s.odocl" project)
+       with_module_list ~excludes:[mcase project ^ "_top"] ~dest:(sprintf "%s.odocl" project)
          (fun () ->
             ocb ~flags @@ sprintf "%s.docdir/index.html" project ;
             install (sprintf "%s.docdir" project))));
@@ -628,17 +655,19 @@ let rules =
          (fun () ->
             List.iter
               (fun test ->
-                 let out = "./" ^ Filename.chop_extension test ^ ".d.byte" in
+                 let out = Filename.chop_extension test ^ ".d.byte" in
                  note "Test" "%s" test ;
                  ocb ~flags ~quiet:true out ;
-                 run ({|OCAMLRUNPARAM="b" |} ^ out) ;
+                 chdir ".." ;
+                 run ({|OCAMLRUNPARAM="b" |} ^ Filename.concat src_dir out) ;
+                 chdir src_dir ;
                  run ("rm " ^ out))
               test_files)));
 
    ("run",
     "Run main or a specified file.",
     Run,
-    (fun { flags; args } ->
+    (fun { flags; args; run_args } ->
        let target =
          match args with
          | [] -> Some "main.ml"
@@ -657,7 +686,8 @@ let rules =
              (fun () ->
                 ocb ~flags ~quiet:true out ;
                 chdir ".." ;
-                run @@ sprintf "OCAMLRUNPARAM=b %s/%s" src_dir out ;
+                run' ~env:["OCAMLRUNPARAM=b"] ~args:run_args
+                  (sprintf "%s/%s" src_dir out) ;
                 chdir src_dir ;
                 run @@ "rm " ^ out)));
   ]
