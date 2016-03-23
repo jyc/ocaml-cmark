@@ -1,4 +1,6 @@
 # begin mk .merlin
+S .
+B _build
 PKG utop
 PKG ctypes.foreign
 # end

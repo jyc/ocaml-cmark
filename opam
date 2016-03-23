@@ -13,7 +13,6 @@ install: ["./car" "lib"]
 remove: ["./car" "unlib"]
 depends: [
   "ocamlfind" {build}
-  "utop" {build}
   "ctypes" {>= "0.4.1"}
   "ctypes-foreign" {>= "0.4.0"}
 ]
