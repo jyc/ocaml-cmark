@@ -1,7 +1,6 @@
 project = "cmark"
 package = "cmark"
 requires = [
-    "utop"
     "ctypes.foreign"
 ]
 flags = []
