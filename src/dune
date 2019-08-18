@@ -1,0 +1,4 @@
+(library
+  (name cmark)
+  (public_name cmark)
+  (libraries ctypes ctypes.foreign utop))
