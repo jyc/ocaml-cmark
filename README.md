@@ -1,7 +1,17 @@
+This is Pablo's fork of [ocaml-cmark][1].
+
+# Differences
+
+* Builds with [Dune][2], because it's what I know.
+* Includes the Unsafe flag for parsing, since I need it for my blog.
+
+Many thanks to jyc for the initial version. Below is the original README, with
+the edits for how to build with Dune.
+
 # ocaml-cmark
 
-ocaml-cmark is an OCaml interface for the [cmark](https://github.com/jgm/cmark)
-CommonMark parsing and rendering library.
+ocaml-cmark is an OCaml interface for the [cmark][3] CommonMark parsing and
+rendering library.
 
 Before installing this, you must install cmark.
 
@@ -18,12 +28,8 @@ They shouldn't be hard to do, just tedious.
 
 # Installing
 
-To build, you will need to install [car](https://github.com/jonathanyc/car), a collection of ocamlbuild aliases.
 
-Then you can install via OPAM with:
 
-    opam pin add cmark .
-
-Alternatively you can install using `car`:
-
-    car lib
+   [1]: https://github.com/jyc/ocaml-cmark
+   [2]: https://github.com/ocaml/dune
+   [3]: https://github.com/commonmark/cmark

@@ -45,6 +45,7 @@ type render_flag = [
     `SourcePos
   | `HardBreaks
   | `Safe
+  | `Unsafe
 ]
 
 type parse_flag = [

@@ -1,6 +1,0 @@
-project = "cmark"
-package = "cmark"
-requires = [
-    "ctypes.foreign"
-]
-flags = []
