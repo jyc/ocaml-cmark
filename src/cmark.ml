@@ -64,6 +64,7 @@ let rec int_of_flags = function
         | `Normalize -> 8
         | `ValidateUTF8 -> 9
         | `Smart -> 10
+        | `Unsafe -> 17
       in (1 lsl bit) lor (int_of_flags rest)
     end
 
@@ -88,7 +89,7 @@ let parse_file' =
 let of_file ?(flags : parse_flag list = []) path =
   let fh = fopen path "r" in
   if fh = null then `Error "fopen: Failed to open file."
-  else 
+  else
     let node = parse_file' fh (int_of_flags flags) in
     let res = fclose fh in
     if res <> 0 then `Error "fclose: Failed to close file."
@@ -112,7 +113,7 @@ let render_latex' =
   foreign "cmark_render_latex" (ptr void @-> int @-> int @-> returning string)
 
 let renderer prim ?(flags : render_flag list = []) { node } =
-  prim node (int_of_flags flags) 
+  prim node (int_of_flags flags)
 
 let rendererw prim ?(flags : render_flag list = []) ~width { node } =
   prim node (int_of_flags flags) width

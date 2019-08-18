@@ -5,11 +5,12 @@ type t
 val html_of_commonmark : string -> string
 
 (* Complex interface *)
-  
+
 type render_flag = [
     `SourcePos
   | `HardBreaks
   | `Safe
+  | `Unsafe
 ]
 
 type parse_flag = [
