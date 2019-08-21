@@ -1,5 +1,0 @@
-# begin mk META
-requires = "ctypes.foreign"
-archive(byte) = "cmark.cma"
-archive(native) = "cmark.cmxa"
-# end

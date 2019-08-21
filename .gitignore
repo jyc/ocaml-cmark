@@ -1,2 +1,6 @@
-*/_build/*
-cmark.top
+_build
+*.merlin
+*.swp
+*.swo
+_opam
+*.install

@@ -1,4 +1,0 @@
-# begin mk _tags
-true: package(ctypes.foreign)
-# end
-true: thread, safe_string
