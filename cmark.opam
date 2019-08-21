@@ -1,22 +1,21 @@
-opam-version: "1.2"
-name: "cmark"
-version: "0.2.0"
-maintainer: "Jonathan Chan <jyc@fastmail.fm>"
+opam-version: "2.0"
+name: "cmarker"
+version: "0.3.0"
+maintainer: "Pablo Meier <pablo.a.meier@gmail.com>"
 authors: "Jonathan Chan <jyc@fastmail.fm>"
-homepage: "https://github.com/jonathanyc/ocaml-cmark"
-bug-reports: "https://github.com/jonathanyc/ocaml-cmark/issues"
+homepage: "https://github.com/pablo-meier/ocaml-cmark"
+synopsis: "Bindings for a local installation of CMark"
+bug-reports: "https://github.com/pablo-meier/ocaml-cmark/issues"
 license: "BSD 2-Clause"
-dev-repo: "git@github.com:jonathanyc/ocaml-cmark.git"
-build: [
-]
-install: ["./car" "lib"]
-remove: ["./car" "unlib"]
+dev-repo: "git@github.com:pablo-meier/ocaml-cmark.git"
+build: [ "dune" "build" ]
+remove: ["opam" "unlib"]
 depends: [
-  "ocamlfind" {build}
   "ctypes" {>= "0.4.1"}
   "ctypes-foreign" {>= "0.4.0"}
+  "utop" {= "2.4.0"}
+  "ocamlformat" {= "0.11.0"}
 ]
 depexts: [
   [["homebrew" "osx"] ["cmark"]]
 ]
-available: [ ocaml-version >= "4.02" ]
